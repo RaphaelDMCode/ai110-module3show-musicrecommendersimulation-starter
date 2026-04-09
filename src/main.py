@@ -16,38 +16,64 @@ def main() -> None:
     songs = load_songs("data/songs.csv")
     print(f"Loaded songs: {len(songs)}")
 
-    # Taste profile — target values used for scoring each song
-    user_prefs = {
-        # Categorical preferences (must match values used in songs.csv)
+    # --- User preference profiles ---
+
+    high_energy_pop = {
         "favorite_genre": "pop",
         "favorite_mood": "happy",
-
-        # Numeric targets (0.0 – 1.0 scale unless noted)
-        "target_energy": 0.80,        # high energy, upbeat tracks
-        "target_tempo_bpm": 120,      # fast, danceable tempo
-        "target_valence": 0.85,       # very positive, feel-good
-        "target_danceability": 0.80,  # strong groove
-        "target_acousticness": 0.20,  # prefers produced/electronic texture
-
-        # Boolean flag — drives a hard boost or filter in scoring
+        "target_energy": 0.90,
+        "target_tempo_bpm": 128,
+        "target_valence": 0.85,
+        "target_danceability": 0.85,
+        "target_acousticness": 0.10,
         "likes_acoustic": False,
     }
 
-    recommendations = recommend_songs(user_prefs, songs, k=5)
+    chill_lofi = {
+        "favorite_genre": "lo-fi",
+        "favorite_mood": "calm",
+        "target_energy": 0.30,
+        "target_tempo_bpm": 75,
+        "target_valence": 0.50,
+        "target_danceability": 0.35,
+        "target_acousticness": 0.75,
+        "likes_acoustic": True,
+    }
 
-    print("\n" + "=" * 50)
-    print("  TOP RECOMMENDATIONS")
-    print("=" * 50)
+    deep_intense_rock = {
+        "favorite_genre": "rock",
+        "favorite_mood": "angry",
+        "target_energy": 0.95,
+        "target_tempo_bpm": 150,
+        "target_valence": 0.25,
+        "target_danceability": 0.45,
+        "target_acousticness": 0.05,
+        "likes_acoustic": False,
+    }
 
-    for rank, (song, score, reasons) in enumerate(recommendations, start=1):
-        print(f"\n#{rank}  {song['title']}  —  {song['artist']}")
-        print(f"    Genre: {song['genre']}  |  Mood: {song['mood']}")
-        print(f"    Score: {score:.2f}")
-        print("    Why:")
-        for reason in reasons:
-            print(f"      • {reason}")
+    # Select the active profile here
+    profiles = {
+        "High-Energy Pop": high_energy_pop,
+        "Chill Lofi": chill_lofi,
+        "Deep Intense Rock": deep_intense_rock,
+    }
 
-    print("\n" + "=" * 50)
+    for profile_name, user_prefs in profiles.items():
+        recommendations = recommend_songs(user_prefs, songs, k=5)
+
+        print("\n" + "=" * 50)
+        print(f"  TOP RECOMMENDATIONS — {profile_name}")
+        print("=" * 50)
+
+        for rank, (song, score, reasons) in enumerate(recommendations, start=1):
+            print(f"\n#{rank}  {song['title']}  —  {song['artist']}")
+            print(f"    Genre: {song['genre']}  |  Mood: {song['mood']}")
+            print(f"    Score: {score:.2f}")
+            print("    Why:")
+            for reason in reasons:
+                print(f"      • {reason}")
+
+        print("\n" + "=" * 50)
 
 
 if __name__ == "__main__":

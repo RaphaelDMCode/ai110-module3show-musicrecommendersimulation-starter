@@ -145,6 +145,15 @@ You can include a simple diagram or bullet list if helpful.
 <a href="Music_Reco_1.png" target="_blank"><img src='Music_Reco_1.png' title='MusicReco App' width='' alt='MusicReco App' class='center-block' /></a>
 <a href="Music_Reco_2.png" target="_blank"><img src='Music_Reco_2.png' title='MusicReco App' width='' alt='MusicReco App' class='center-block' /></a>
 
+# High-Energy Pop
+<a href="MusicReco_High-Energy-Pop.png" target="_blank"><img src='MusicReco_High-Energy-Pop.png' title='MusicReco App' width='' alt='MusicReco App' class='center-block' /></a>
+
+# Chill Lofi
+<a href="MusicReco_Chill-Lofi.png" target="_blank"><img src='MusicReco_Chill-Lofi.png' title='MusicReco App' width='' alt='MusicReco App' class='center-block' /></a>
+
+# Deep Intense Rock
+<a href="MusicReco_Deep-Intense-Rock.png" target="_blank"><img src='MusicReco_Deep-Intense-Rock.png' title='MusicReco App' width='' alt='MusicReco App' class='center-block' /></a>
+
 ---
 
 ## Getting Started
