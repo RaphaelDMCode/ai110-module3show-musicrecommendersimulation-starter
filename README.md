@@ -17,6 +17,103 @@ Replace this paragraph with your own summary of what your version does.
 
 ## How The System Works
 
+# Algorithm Recipe: Scoring Each Songs
+- Rule 1: Matched Genre (categorical - 0.35)
+- Rule 2: Mood Match (categorical - 0.25)
+- Rule 3: Energy Proximity (numeric - 0.25) → (1.0 - abs(song.energy - user.target_energy))
+- Rule 4: Acoustic Preference (boolean - 0.15)
+- Score = (genre_match * W1) + (mood_match * W2) + (energy_score * W3) + (acoustic_match * W4)
+
+# Explain your understanding of how real-world recommendations work and what your version (recommender system) will prioritize:
+- My basic understaning to how the recommendation system works was that it tracks the user's music history. It tracks the music's elements such as genre, mood, or tempo to filter out musics or content-based filtering and such. My version of the recommender system will prioritize the Scoring System for songs which inlucdes 4 rules which are the Genre Matched, Mood Matched, Energy Proximity, and Acoustic Preferences.
+
+# [Finalized Algorithm Recipe] #
+score_song(song, user_prefs) → (float, str)
+
+INPUTS
+  song        — one row from songs.csv as a dict
+  user_prefs  — the taste profile dict from main.py
+
+SCORING RULES
+  score = 0.0
+  reasons = []
+
+  1. GENRE MATCH (categorical, hard match)
+     if song["genre"] == user_prefs["favorite_genre"]:
+         score += 2.0
+         reasons += ["genre match"]
+
+  2. MOOD MATCH (categorical, hard match)
+     if song["mood"] == user_prefs["favorite_mood"]:
+         score += 1.0
+         reasons += ["mood match"]
+
+  3. ENERGY SIMILARITY (numeric, continuous)
+     energy_diff = abs(song["energy"] - user_prefs["target_energy"])
+     energy_score = max(0.0, 1.0 - energy_diff)   # 1.0 if perfect, 0.0 if diff ≥ 1.0
+     score += energy_score
+     if energy_diff < 0.15:
+         reasons += ["energy is close"]
+
+  --- OPTIONAL EXTENSIONS (add if you want a richer recipe) ---
+
+  4. ACOUSTICNESS BOOST (boolean gate)
+     if user_prefs["likes_acoustic"] and song["acousticness"] > 0.70:
+         score += 0.5
+         reasons += ["acoustic texture"]
+
+  5. TEMPO SIMILARITY (numeric, same pattern as energy)
+     tempo_diff = abs(song["tempo_bpm"] - user_prefs["target_tempo_bpm"]) / 200
+     score += max(0.0, 0.5 - tempo_diff)   # max 0.5 points, scaled by 200 BPM range
+
+RETURN
+  explanation = ", ".join(reasons) or "no strong match"
+  return (score, explanation)
+
+MAX POSSIBLE SCORE
+  Base rules only:    4.0  (2.0 + 1.0 + 1.0)
+  With extensions:    5.0  (+ 0.5 acoustic + 0.5 tempo)
+
+
+# Mermaid.js Flowchart
+flowchart TD
+    A[User Preferences\ngenre · mood · energy · tempo\nvalence · danceability · acousticness · likes_acoustic] --> B
+
+    B[load_songs\nParse songs.csv into a list of song dicts] --> C
+
+    C{For each song in the list}
+
+    C --> D[score_song\nCompare song attributes\nagainst user preferences]
+
+    D --> E{Categorical match?\ngenre · mood}
+    E -->|Yes| F[Add genre/mood bonus]
+    E -->|No| G[No bonus]
+
+    F --> H[Numeric proximity scoring\nenergy · tempo · valence\ndanceability · acousticness]
+    G --> H
+
+    H --> I{likes_acoustic flag set?}
+    I -->|True| J[Apply acousticness boost]
+    I -->|False| K[No boost]
+
+    J --> L[Final score + explanation string]
+    K --> L
+
+    L --> C
+
+    C -->|All songs scored| M[Sort all songs by score descending]
+    M --> N[Slice top K results]
+    N --> O[Output: Top K Recommendations\nsong · score · explanation]
+
+
+# Documenting the Plan of the Data Recommender will be use
+- The Plan is that the Reccommender System basically reads the datas in songs.csv and gathers their attributes (genre, energy and such) and compares it to the User's Taste Profile in #file:main.py which also holds attributes. It then score each songs by comparing it to the User's preferebces where if the Genre matches +2, Mood Matches +1, Energy closed to Target Energy +0-1, and close to Acoustic then +0.5.
+
+# Potential Biases Expected
+- The Genre having more Weight than the others, causing mismatched matches.
+- The Mood of Songs must match the exact mood it is searching for, causing similar moods not to be matched.
+- There is no diversity of songs, always picking the closest thing to match.
+
 Explain your design in plain language.
 
 Some prompts to answer:
@@ -28,6 +125,25 @@ Some prompts to answer:
 - How do you choose which songs to recommend
 
 You can include a simple diagram or bullet list if helpful.
+- `Song` Features:
+  - Genre
+  - Mood
+  - Energy
+  - Acoustic
+- `UserProfile` Features:
+  - Favorite_Genre
+  - Favorite_Mood
+  - Target_Energy
+  - Likes_Acoustic
+- `Recommender` Computation of Song Scores
+  - Song.Genre = Favorite_Genre
+  - Song.Mood = Favorite_Mood
+  - 1.0 - abs(Song.Energy - Target_Energy)
+  - If User Likes_Acoustic → Acoustic Pref = 1, else 0.
+
+# Terminal Image
+<a href="Music_Reco_1.png" target="_blank"><img src='Music_Reco_1.png' title='MusicReco App' width='' alt='MusicReco App' class='center-block' /></a>
+<a href="Music_Reco_2.png" target="_blank"><img src='Music_Reco_2.png' title='MusicReco App' width='' alt='MusicReco App' class='center-block' /></a>
 
 ---
 
